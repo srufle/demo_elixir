@@ -1,7 +1,6 @@
 # DemoElixir
 
-**TODO: Add description**
-
+Clone of [AkkaDemo](https://github.com/alfredherr/demo) (but in a proper actor-model based language and runtime)
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
