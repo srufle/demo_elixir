@@ -1,5 +1,6 @@
 defmodule DemoElixirTest do
   use ExUnit.Case
+  import ExProf.Macro
   doctest DemoElixir.Application
   @milliseconds (1000)
   @milliseconds_micro (1000 * @milliseconds)
@@ -18,16 +19,18 @@ defmodule DemoElixirTest do
     IO.puts("minutes: #{@minutes} in milliseconds")
     IO.puts("timeout_period: #{@timeout_period} in milliseconds")
     IO.puts("acceptable_period: #{@acceptable_period} in microseconds")
-    
+
     IO.puts(
       "Testing that dets storage of #{@number_of_accounts} accounts happens in under #{
         @acceptable_period / (@minutes_micro)
       } minutes"
     )
 
-    1..@number_of_accounts
-    |> Enum.map(&build(&1))
-    |> Enum.map(&Datastore.put(:db, &1))
+    profile do
+      1..@number_of_accounts
+      |> Enum.map(&build(&1))
+      |> Enum.map(&Datastore.put(:db, &1))
+    end
 
     on_exit(fn ->
       IO.puts("This is invoked once the test is done. Process: #{inspect(self())}")
@@ -35,27 +38,33 @@ defmodule DemoElixirTest do
       #File.rm!("accounts.dets")
       IO.puts("Deleting file portfolios.dets")
      # File.rm!("portfolios.dets")
-     Datastore.close(:db)
+      Datastore.close(:db)
     end)
   end
 
   @tag timeout: @timeout_period
   test "account stored within acceptable time of #{@acceptable_period} ms" do
-    {time, _} = :timer.tc(fn -> wait_for_store(@number_of_accounts) end, [])
-    report_time(time)
-    assert time <= @acceptable_period
+    profile do
+      {time, _} = :timer.tc(fn -> wait_for_store(@number_of_accounts) end, [])
+      report_time(time)
+      assert time <= @acceptable_period
+    end
   end
+
 
   @tag timeout: @timeout_period
   test "last account retrieved" do
+    profile do
     {time, [{account_number, _} | _]} =
       :timer.tc(fn -> wait_for_store(@number_of_accounts) end, [])
       report_time(time)
     assert @number_of_accounts = account_number
+    end
   end
 
   @tag timeout: @timeout_period
   test "All keys were retrieved successfully" do
+    profile do
     list =
       1..@number_of_accounts
       |> Enum.map(&build(&1))
@@ -64,6 +73,7 @@ defmodule DemoElixirTest do
 
     records = length(list)
     assert @number_of_accounts = records
+    end
   end
 
   defp extract_key([{key, %AccountModel{account_number: key}} | _] = _result) do
