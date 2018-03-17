@@ -1,8 +1,10 @@
 defmodule DemoElixirTest do
   use ExUnit.Case
   doctest DemoElixir.Application
-  @timeout_period 60 * 60 * 1000
-  @acceptable_period 10 * 60 * 1000 * 1000
+  @seconds 60 * 1000
+  @minutes 60 * @seconds
+  @timeout_period 1 * @minutes
+  @acceptable_period 10 * @minutes
   @number_of_accounts 120_000
 
   setup_all do
@@ -10,7 +12,7 @@ defmodule DemoElixirTest do
 
     IO.puts(
       "Testing that dets storage of #{@number_of_accounts} accounts happens in under #{
-        @acceptable_period / (1000 * 1000 * 60)
+        @acceptable_period / (@minutes)
       } minutes"
     )
 
