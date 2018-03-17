@@ -1,11 +1,11 @@
 defmodule DemoElixirTest do
   use ExUnit.Case
   doctest DemoElixir.Application
-  @seconds 60 * 1000
-  @minutes 60 * @seconds
-  @timeout_period 1 * @minutes
+  @seconds (60 * 1000)
+  @minutes (60 * @seconds)
+  @timeout_period (10 * @minutes)
   @acceptable_period 10 * @minutes
-  @number_of_accounts 120_000
+  @number_of_accounts 120_000 * 2
 
   setup_all do
     IO.puts("This is a setup callback for #{inspect(self())}")
