@@ -1,16 +1,27 @@
 defmodule DemoElixirTest do
   use ExUnit.Case
   doctest DemoElixir.Application
-  @timeout_period 60 * 60 * 1000
-  @acceptable_period 10 * 60 * 1000 * 1000
+  @milliseconds (1000)
+  @milliseconds_micro (1000 * @milliseconds)
+  @seconds (60 * @milliseconds)
+  @seconds_micro (60 * @milliseconds_micro)
+  @minutes (60 * @seconds)
+  @minutes_micro (60 * @seconds_micro)
+
+  @timeout_period (10 * @minutes)
+  @acceptable_period (10 * @minutes_micro)
   @number_of_accounts 120_000
 
   setup_all do
     IO.puts("This is a setup callback for #{inspect(self())}")
-
+    IO.puts("seconds: #{@seconds} in milliseconds")
+    IO.puts("minutes: #{@minutes} in milliseconds")
+    IO.puts("timeout_period: #{@timeout_period} in milliseconds")
+    IO.puts("acceptable_period: #{@acceptable_period} in microseconds")
+    
     IO.puts(
       "Testing that dets storage of #{@number_of_accounts} accounts happens in under #{
-        @acceptable_period / (1000 * 1000 * 60)
+        @acceptable_period / (@minutes_micro)
       } minutes"
     )
 
@@ -69,9 +80,9 @@ defmodule DemoElixirTest do
   end
 
   defp report_time(time) do
-    minutes = Float.round(time / (1000 * 1000 * 60), 2)
+    minutes = Float.round((time / (@seconds_micro)), 2)
 
-    if time > 1000 * 1000 do
+    if time > @milliseconds_micro do
       IO.puts(
         "It took #{minutes} minutes (#{time}µs) to store #{@number_of_accounts} accounts to disk."
       )
