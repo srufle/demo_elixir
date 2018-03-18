@@ -1,4 +1,4 @@
-defmodule DomainEvent do
+defmodule DomainEventModel do
   defstruct Event: nil, Date: :calendar.local_time
 end
 

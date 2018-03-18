@@ -18,7 +18,7 @@ defmodule DemoElixirTest do
     IO.puts("minutes: #{@minutes} in milliseconds")
     IO.puts("timeout_period: #{@timeout_period} in milliseconds")
     IO.puts("acceptable_period: #{@acceptable_period} in microseconds")
-    
+
     IO.puts(
       "Testing that dets storage of #{@number_of_accounts} accounts happens in under #{
         @acceptable_period / (@minutes_micro)
@@ -31,10 +31,10 @@ defmodule DemoElixirTest do
 
     on_exit(fn ->
       IO.puts("This is invoked once the test is done. Process: #{inspect(self())}")
-      IO.puts("Deleting file accounts.dets")
+      #IO.puts("Deleting file accounts.dets")
       #File.rm!("accounts.dets")
-      IO.puts("Deleting file portfolios.dets")
-     # File.rm!("portfolios.dets")
+      #IO.puts("Deleting file portfolios.dets")
+      #File.rm!("portfolios.dets")
      Datastore.close(:db)
     end)
   end
@@ -65,6 +65,10 @@ defmodule DemoElixirTest do
     records = length(list)
     assert @number_of_accounts = records
   end
+
+  ##########################################################
+  # Helper functions
+  ##########################################################
 
   defp extract_key([{key, %AccountModel{account_number: key}} | _] = _result) do
     key

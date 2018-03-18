@@ -3,9 +3,11 @@ defmodule Datastore do
   require Logger
   @accounts "db/accounts.dets"
   @portfolios "db/portfolios.dets"
-  ## 2 hours
-  @dbs_backup_cycle 2 * 60 * 60 * 1000
+  @dbs_backup_cycle 2 * 60 * 60 * 1000   ## 2 hours
+
+  ##########################################################
   # Client API
+  ##########################################################
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [], name: :db)
@@ -45,7 +47,28 @@ defmodule Datastore do
     GenServer.cast(pid, {:backup})
   end
 
-  # Server Callbacks
+  ##########################################################
+  # Callbacks
+  ##########################################################
+
+  def init(args) do
+    # In 2 hours
+    Process.send_after(self(), :work, @dbs_backup_cycle)
+
+    {:ok, args}
+  end
+
+  def handle_info(:work, state) do
+    # Do the work you desire here
+    close_dbs()
+    backup_dbs()
+    reopen_dbs()
+    # Start the timer again
+    # In 2 hours
+    Process.send_after(self(), :work, @dbs_backup_cycle)
+    {:noreply, state}
+  end
+
   def handle_call({:create_tables}, _from, _) do
     a =
       case :dets.open_file(@accounts, type: :set) do
@@ -104,6 +127,10 @@ defmodule Datastore do
     {:noreply, found}
   end
 
+  ##########################################################
+  # Helper functions
+  ##########################################################
+
   defp close_dbs() do
     a = :dets.close(@accounts)
     p = :dets.close(@portfolios)
@@ -121,27 +148,5 @@ defmodule Datastore do
     a = :dets.open_file(@accounts, type: :set, ram_file: true)
     p = :dets.open_file(@portfolios, type: :set, ram_file: true)
     {a, p}
-  end
-
-  ## Startup
-  def init(args) do
-    # In 2 hours
-    Process.send_after(self(), :work, @dbs_backup_cycle)
-
-
-    {:ok, args}
-  end
-
-  def handle_info(:work, state) do
-    # Do the work you desire here
-    close_dbs()
-    backup_dbs()
-    reopen_dbs()
-    # Start the timer again
-    # In 2 hours
-    Process.send_after(self(), :work, @dbs_backup_cycle)
-
-
-    {:noreply, state}
   end
 end
