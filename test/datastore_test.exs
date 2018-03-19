@@ -10,7 +10,7 @@ defmodule DatastoreTest do
 
   @timeout_period 10 * @minutes
   @acceptable_period 10 * @minutes_micro
-  @number_of_accounts 1_200_00
+  @number_of_accounts 1_200_000
 
   setup_all do
     IO.puts("This is a setup callback for #{inspect(self())}")
@@ -94,7 +94,7 @@ defmodule DatastoreTest do
   end
 
   defp build(num) do
-     %AccountModel{account_number: name}
+     %AccountModel{account_number: num}
   end
 
   defp wait_for_store(key) do
