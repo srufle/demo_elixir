@@ -6,6 +6,14 @@ defmodule Account do
     GenServer.start_link(__MODULE__, default)
   end
 
+  def init(%AccountModel{} = state) do
+    {:ok, state}
+  end
+
+  ##########################################################
+  # Client API
+  ##########################################################
+
   def create(pid, %AccountModel{} = a) do
     GenServer.call(pid, {:create, a})
   end
@@ -18,8 +26,12 @@ defmodule Account do
     GenServer.call(pid, {:get_state}, timeout)
   end
 
+  ##########################################################
+  # Callbacks
+  ##########################################################
+
   def handle_call({:get_state}, _from, state) do
-    {:reply, {:ok,state},state}
+    {:reply, {:ok, state}, state}
   end
 
   def handle_call({:assess_receivable, receivable}, _from, state) do
@@ -29,15 +41,15 @@ defmodule Account do
     newstate = %{newstate | events: newevents}
 
     case Datastore.put(:db, newstate) do
-      {:ok, saved} -> {:reply, {:ok, saved} , newstate}
-      {_, error} -> {:reply, {:error, error} , state}
+      {:ok, saved} -> {:reply, {:ok, saved}, newstate}
+      {_, error} -> {:reply, {:error, error}, state}
     end
   end
 
-  def handle_call({:create, account},_, _) do
-    {:ok,newstate}=Datastore.put(:db, account)
+  def handle_call({:create, account}, _, _) do
+    {:ok, newstate} = Datastore.put(:db, account)
     ## account becomes state
-    {:reply, {:ok,newstate},newstate}
+    {:reply, {:ok, newstate}, newstate}
   end
 
   def handle_cast(request, state) do
@@ -53,9 +65,5 @@ defmodule Account do
     }
 
     {amount, event}
-  end
-
-  def init(%AccountModel{} = state) do
-    {:ok, state}
   end
 end
