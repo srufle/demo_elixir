@@ -1,5 +1,5 @@
 defmodule DomainEventModel do
-  defstruct Event: nil, Date: :calendar.local_time
+  defstruct event: nil, Date: :calendar.local_time
 end
 
 defimpl String.Chars, for: DomainEvent do

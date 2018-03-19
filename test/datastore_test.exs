@@ -1,4 +1,4 @@
-defmodule DemoElixirTest do
+defmodule DatastoreTest do
   use ExUnit.Case
   doctest DemoElixir.Application
   @milliseconds (1000)
@@ -10,7 +10,7 @@ defmodule DemoElixirTest do
 
   @timeout_period (10 * @minutes)
   @acceptable_period (10 * @minutes_micro)
-  @number_of_accounts 120_000
+  @number_of_accounts 1_000_000
 
   setup_all do
     IO.puts("This is a setup callback for #{inspect(self())}")
@@ -48,7 +48,7 @@ defmodule DemoElixirTest do
 
   @tag timeout: @timeout_period
   test "last account retrieved" do
-    {time, [{account_number, _} | _]} =
+    {time, {account_number, _}} =
       :timer.tc(fn -> wait_for_store(@number_of_accounts) end, [])
       report_time(time)
     assert @number_of_accounts = account_number
@@ -70,7 +70,7 @@ defmodule DemoElixirTest do
   # Helper functions
   ##########################################################
 
-  defp extract_key([{key, %AccountModel{account_number: key}} | _] = _result) do
+  defp extract_key( {key, %AccountModel{account_number: key}}  = _result) do
     key
   end
 
