@@ -1,27 +1,22 @@
 defmodule DatastoreTest do
   use ExUnit.Case
+  import TimeUnits
   doctest DemoElixir.Application
-  @milliseconds 1000
-  @milliseconds_micro 1000 * @milliseconds
-  @seconds 60 * @milliseconds
-  @seconds_micro 60 * @milliseconds_micro
-  @minutes 60 * @seconds
-  @minutes_micro 60 * @seconds_micro
 
-  @timeout_period 10 * @minutes
-  @acceptable_period 10 * @minutes_micro
+  @timeout_period (10 * minutes())
+  @acceptable_period (10 * minutes_as_micro())
   @number_of_accounts 1_200_000
 
   setup_all do
     IO.puts("This is a setup callback for #{inspect(self())}")
-    IO.puts("seconds: #{@seconds} in milliseconds")
-    IO.puts("minutes: #{@minutes} in milliseconds")
+    IO.puts("seconds: #{seconds()} in milliseconds")
+    IO.puts("minutes: #{minutes()} in milliseconds")
     IO.puts("timeout_period: #{@timeout_period} in milliseconds")
     IO.puts("acceptable_period: #{@acceptable_period} in microseconds")
 
     IO.puts(
       "Testing that dets storage of #{@number_of_accounts} accounts happens in under #{
-        @acceptable_period / @minutes_micro
+        @acceptable_period / (minutes_as_micro())
       } minutes"
     )
 
@@ -103,8 +98,7 @@ defmodule DatastoreTest do
   end
 
   defp report_time(time, message) do
-    minutes = Float.round(time / @seconds_micro, 3)
-
-    IO.puts("It took  #{time} µs or #{minutes} minutes to #{message}")
+    as_minutes = Float.round(time / seconds_as_micro(), 3)
+    IO.puts("It took  #{time} µs or #{as_minutes} minutes to #{message}")
   end
 end
