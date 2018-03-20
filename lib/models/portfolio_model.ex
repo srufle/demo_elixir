@@ -1,5 +1,5 @@
 defmodule PortfolioModel do
-  defstruct portfolio_number: "P", current_balance: 0.0, events: %DomainEvent{}
+  defstruct portfolio_number: "P", current_balance: 0.0, events: %DomainEventModel{}
 end
 defimpl String.Chars, for: PortfolioModel do
   def to_string(p) do
