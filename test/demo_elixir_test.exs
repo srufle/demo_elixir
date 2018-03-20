@@ -1,27 +1,23 @@
 defmodule DemoElixirTest do
   use ExUnit.Case
+  import TimeUnits
   doctest DemoElixir.Application
-  @milliseconds (1000)
-  @milliseconds_micro (1000 * @milliseconds)
-  @seconds (60 * @milliseconds)
-  @seconds_micro (60 * @milliseconds_micro)
-  @minutes (60 * @seconds)
-  @minutes_micro (60 * @seconds_micro)
 
-  @timeout_period (10 * @minutes)
-  @acceptable_period (10 * @minutes_micro)
+  @timeout_period (10 * minutes())
+  @acceptable_period (10 * minutes_as_micro())
   @number_of_accounts 120_000
 
   setup_all do
+
     IO.puts("This is a setup callback for #{inspect(self())}")
-    IO.puts("seconds: #{@seconds} in milliseconds")
-    IO.puts("minutes: #{@minutes} in milliseconds")
+    IO.puts("seconds: #{seconds()} in milliseconds")
+    IO.puts("minutes: #{minutes()} in milliseconds")
     IO.puts("timeout_period: #{@timeout_period} in milliseconds")
     IO.puts("acceptable_period: #{@acceptable_period} in microseconds")
     
     IO.puts(
       "Testing that dets storage of #{@number_of_accounts} accounts happens in under #{
-        @acceptable_period / (@minutes_micro)
+        @acceptable_period / (minutes_as_micro())
       } minutes"
     )
 
@@ -66,6 +62,10 @@ defmodule DemoElixirTest do
     assert @number_of_accounts = records
   end
 
+  def sec() do
+    1000
+  end
+
   defp extract_key([{key, %AccountModel{account_number: key}} | _] = _result) do
     key
   end
@@ -80,11 +80,11 @@ defmodule DemoElixirTest do
   end
 
   defp report_time(time) do
-    minutes = Float.round((time / (@seconds_micro)), 2)
+    as_minutes = Float.round((time / (seconds_as_micro())), 2)
 
-    if time > @milliseconds_micro do
+    if time > milliseconds_as_micro() do
       IO.puts(
-        "It took #{minutes} minutes (#{time}µs) to store #{@number_of_accounts} accounts to disk."
+        "It took #{as_minutes} minutes (#{time}µs) to store #{@number_of_accounts} accounts to disk."
       )
     else
       IO.puts(
